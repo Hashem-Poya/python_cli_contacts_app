@@ -4,6 +4,10 @@ import pyfiglet
 from db_operations import *
 from validation import *
 import call_back_methods
+import xlsxwriter
+import os
+import utlis
+from datetime import date, datetime
 
 
 def insertion():
@@ -17,6 +21,7 @@ def insertion():
 
     def userInput(name, lastname, email, age, address, phone):
         UserOperations.insert(name, lastname, email, age, address, phone)
+        print(os.getcwd())
 
     userInput()
 
@@ -38,7 +43,11 @@ def show_columns(rows):
 ascii_banner = pyfiglet.figlet_format("BOOK CONTACT (CLI) PROJECT")
 print(ascii_banner)
 
+
 while True:
+    print('')
+    print('===================================================================================================')
+    print('')
     print('Type 0 for list all Contacts')
     print('Type 1 for create contacts')
     print('Type 2 for search Contacts')
@@ -46,12 +55,15 @@ while True:
     print('Type 4 for Delete Contacts')
     print('Type 5 for other actoins...')
     print('Type 6 for Exit.')
+    print('')
+    print('===================================================================================================')
+    print('')
+
     checker = int(input('Enter the number for the Operations: '))
 
 
 
     if checker == 0:
-        print('Zero')
         rows = UserOperations.get_info()
         show_columns(rows)
     elif checker == 1:
@@ -103,11 +115,59 @@ while True:
             print('Not found')
     
     elif checker == 5:
-        print('Actions such as Backup....')
-    
+        print('============================================================================================')
+        print('')
+        print('Type 0 for creating a Backup of Database')
+        print('Type 1 for Create Report in Excel format')
+        print('')
+        print('=============================================================================================')
+        print('')
+        actions = input('Type a number to perform the Operation: ')
+        if actions == '0':
+            UserOperations.take_a_backup()
+            print('Backup Created.')
+            print('')
+        elif actions == '1':
+ 
+            header_row = ['ID', 'Name', 'Lastname', 'Email', 'Age', 'Address', 'Phone']
+            # report_name = str('Report_{year}-{month}-{day}_{hour}:{minute}:{second}.xlsx'.format(year=str(current_year), month=str(current_month), day=str(current_day), hour=str(current_hour), minute=str(current_minute), second=str(current_second)))
+
+            workbook = xlsxwriter.Workbook('report.xlsx')
+            worksheet = workbook.add_worksheet('Worksheet')
+
+            cell_format = workbook.add_format()
+            cell_format.set_bold(bold=True)
+            cell_format.set_font_color('red')
+            cell_format.set_center_across()
+
+            worksheet.write_row(0, 0, header_row, cell_format=cell_format)
+            
+            row = 1
+            column = 0
+
+            for row_data in UserOperations.get_info():
+                worksheet.write_row(row, column, row_data)
+                row += 1
+            
+            workbook.close()
+            print('')
+            print('Report generated as Excel sheet.')
+            print('')
+
+
+            # print('')
+            # print('====================================================================')
+            # print('')
+            # do_open = input('Do you want to Open the Generated Excel file ? (y, n): ')
+            # if do_open == 'y':
+            #     path = os.path.join(os.getcwd(), '/home/ubuntu/Desktop/project/report.xlsx')
+            #     os.popen('libreoffice --calc {name}'.format(name=path))
+            # else:
+            #     pass
+
+
     elif checker == 6:
         sys.exit()
     else:
         click.secho('Invalid Number for the specific Operations.', fg='red')
         sys.exit()
-

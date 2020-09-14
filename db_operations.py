@@ -1,4 +1,7 @@
 from db_connection import connection
+import sqlite3
+import utlis
+import os
 
 class UserOperations:
     @staticmethod
@@ -17,6 +20,8 @@ class UserOperations:
             print('Error occured...')
             print(e)
         db.commit()
+
+        
     @staticmethod
     def get_info():
         db = connection()
@@ -53,4 +58,20 @@ class UserOperations:
         c.execute(sql, (delete_keyword, delete_keyword, delete_keyword))
         db.commit()
     
+    @staticmethod
+    def take_a_backup():
+        try:
+            db = connection()
+            b_dir = utlis.create_dir_if_not_exists('Backup_dir')
+            backup_db = sqlite3.connect(b_dir + '/' + 'backup.db')
+            db.backup(backup_db)
+        
+        except Exception as e:
+            print(e)
+        finally:
+            if backup_db:
+                db.close()
+                backup_db.close()
+                os.chdir('../')    
+
 

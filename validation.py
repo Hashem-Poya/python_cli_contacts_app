@@ -23,9 +23,7 @@ class Validation:
 
     @staticmethod
     def validate_age(age):
-        if type(age) is str:
-            return False
-        elif int(age) <= 120 and int(age) >= 1:
+        if int(age) <= 120 and int(age) >= 1:
             return True
         else:
             return False
